@@ -19,8 +19,10 @@ public class UserPrincipalDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
+		// DB정보와 입력한 사용자정보가 일치하는 경우 UserDetail 객체 리턴
 		User user = this.repository.findByUserId(username);
 
+		// 일치하지 않을경우 처리
 		if(user == null) throw new UsernameNotFoundException("");
 
 		return new UserPrincipalDetails(user);

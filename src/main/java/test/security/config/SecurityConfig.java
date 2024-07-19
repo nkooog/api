@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.SecurityFilterChain;
 import test.security.auth.UserPrincipalDetailsService;
 import test.security.handler.UserAuthFailHandler;
+import test.security.handler.UserAuthSucessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -19,33 +20,33 @@ public class SecurityConfig {
 		this.userPrincipalDetailsService = userPrincipalDetailsService;
 	}
 
-	@Bean
-	public WebSecurityCustomizer webSecurityCustomizer(){
-		return web -> web.ignoring()
-				.requestMatchers("/css/**", "/js/**", "/images/**");
-	}
+		@Bean
+		public WebSecurityCustomizer webSecurityCustomizer(){
+			return web -> web.ignoring()
+					.requestMatchers("/css/**", "/js/**", "/images/**");
+		}
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http
-				.csrf((csrfConfigurer) ->
-						csrfConfigurer.disable()
+		@Bean
+		public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+			http
+					.csrf(csrfConfigurer -> csrfConfigurer.ignoringRequestMatchers("/h2-console/**").disable())
+				.headers(headerConfig -> headerConfig.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())
 				)
-				.headers((headersConfig) ->
-						headersConfig.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())
-				)
-				.authorizeHttpRequests(request ->
-					request.requestMatchers("/h2-console/**", "/login").permitAll()
-							.anyRequest().authenticated()
-				)
+				.authorizeHttpRequests(auth ->
+							auth.requestMatchers("/login", "/join")
+						)
 				.formLogin(form ->
-						form.loginPage("/login")
-								.loginProcessingUrl("/main")
-								.failureHandler(new UserAuthFailHandler())
-								.permitAll()
-					).logout( httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer.logoutUrl("/logout").logoutSuccessUrl("/login?logout=1").deleteCookies("JSESSIONID"))
-				.userDetailsService(userPrincipalDetailsService);
-
+							form.loginPage("/login")
+									.loginProcessingUrl("/user/login")
+									.defaultSuccessUrl("/user/main")
+									.successHandler(new UserAuthSucessHandler())
+									.failureHandler(new UserAuthFailHandler())
+									.permitAll()
+						).logout(
+								logout -> logout.logoutUrl("/logout")
+												.logoutSuccessUrl("/login?logout=1")
+												.deleteCookies("JSESSIONID")
+				);
 		return http.build();
 	}
 

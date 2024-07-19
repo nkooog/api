@@ -16,6 +16,11 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+
+		//AuthenticationManager에게 위임받아 사용자 정보를 인증하고 인증객체를 만들어줌
+
+		//DB에 있는 사용자정보와 form을 통해 입력한 사용자 정보 매칭 인증
+
 		return new UsernamePasswordAuthenticationToken(details
 				,null
 				,details.getAuthorities()
