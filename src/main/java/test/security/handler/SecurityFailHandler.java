@@ -9,17 +9,18 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 
 import java.io.IOException;
 
-public class UserAuthFailHandler extends SimpleUrlAuthenticationFailureHandler {
+public class SecurityFailHandler extends SimpleUrlAuthenticationFailureHandler {
 
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
 
+		// 실패 메세지를 담기 위한 세션 선언
 		HttpSession session = request.getSession();
-
-		session.setAttribute("loginFailMessage", exception.getMessage());
-
-		setDefaultFailureUrl("/login");
-
+		// 세션에 실패 메세지 담기
+		session.setAttribute("loginErrorMessage", exception.getMessage());
+		// 로그인 실패시 이동할 페이지
+		setDefaultFailureUrl("/member/login/loginForm?error=true&t=h");
+		// 로그인 실패시 이동할 페이지로 이동
 		super.onAuthenticationFailure(request, response, exception);
 	}
 }

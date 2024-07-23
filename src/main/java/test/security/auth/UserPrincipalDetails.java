@@ -1,6 +1,5 @@
 package test.security.auth;
 
-import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
-@Getter
 public class UserPrincipalDetails implements UserDetails {
 
 	private final User user;
@@ -20,6 +17,9 @@ public class UserPrincipalDetails implements UserDetails {
 		this.user = user;
 	}
 
+	public User getUser() {
+		return user;
+	}
 
 	// 계정의 권한을 담아두기위해
 	@Override

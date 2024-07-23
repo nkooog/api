@@ -8,11 +8,13 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 
 import java.io.IOException;
 
-public class UserAuthSucessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class SecuritySucessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+		// 로그인 성공시 이동할 페이지
 		setDefaultTargetUrl("/main");
+		// 로그인 성공시 이동할 페이지로 이동
 		super.onAuthenticationSuccess(request, response, authentication);
 	}
 }
