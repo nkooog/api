@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class JwtFilter extends OncePerRequestFilter {
 
-	// 중간에 jwtFilter 에서 토큰 검증
+	// http요청을 중간에 jwtFilter[커스터마이징 필터] 에서 토큰 검증
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

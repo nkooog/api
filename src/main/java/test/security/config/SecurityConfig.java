@@ -1,19 +1,12 @@
 package test.security.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.SecurityFilterChain;
-import test.security.auth.UserPrincipalDetailsService;
-import test.security.handler.SecurityFailHandler;
-import test.security.handler.SecuritySucessHandler;
 import test.security.jwt.JwtAuthencationEntryPoint;
-import test.security.provider.UserAuthenticationProvider;
 
 @Configuration
 @EnableWebSecurity
