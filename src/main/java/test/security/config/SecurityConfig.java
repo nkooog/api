@@ -6,16 +6,20 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import test.security.jwt.JwtAuthencationEntryPoint;
+import test.security.jwt.JwtFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
 	private final JwtAuthencationEntryPoint entryPoint;
+	private final JwtFilter filter;
 
-	public SecurityConfig(JwtAuthencationEntryPoint entryPoint) {
+	public SecurityConfig(JwtAuthencationEntryPoint entryPoint, JwtFilter filter) {
 		this.entryPoint = entryPoint;
+		this.filter = filter;
 	}
 
 	@Bean
@@ -29,7 +33,8 @@ public class SecurityConfig {
 								.permitAll()
 								.anyRequest().hasRole("USER"))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.exceptionHandling(exceptionHalder->exceptionHalder.authenticationEntryPoint(entryPoint));
+				.exceptionHandling(exceptionHalder->exceptionHalder.authenticationEntryPoint(entryPoint))
+				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
 
