@@ -13,11 +13,6 @@ import java.io.IOException;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-	private JwtAuthencationEntryPoint entryPoint;
-	public JwtFilter(JwtAuthencationEntryPoint entryPoint) {
-		this.entryPoint = entryPoint;
-	}
-
 	// http요청을 중간에 jwtFilter[커스터마이징 필터] 에서 토큰 검증
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -33,7 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		}else{
 			// error handler
-			entryPoint.commence(request, response, new AuthenticationException("유효하지 않은 토큰") {});
+			throw new AuthenticationException("토큰이 없음"){};
 		}
 
 
