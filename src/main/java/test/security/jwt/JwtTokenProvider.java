@@ -36,20 +36,20 @@ public class JwtTokenProvider {
 
 		long now = (new Date()).getTime();
 
-		LocalDateTime time = LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		Date accessTokenExpiration = getTokenDate(1);
+		Date refreshTokenExpiration = getTokenDate(7);
 
 		// Access Token 생성
-//		Date accessTokenExpiresIn = new Date(now + 86400000);
 		String accessToken = Jwts.builder()
 				.subject(authentication.getName())
 				.claim("auth", authorities)
-				.expiration(accessTokenExpiresIn)
+				.expiration(accessTokenExpiration)
 				.signWith(key, SignatureAlgorithm.HS256)
 				.compact();
 
 		// Refresh Token 생성
 		String refreshToken = Jwts.builder()
-				.setExpiration(new Date(now + 86400000))
+				.setExpiration(refreshTokenExpiration)
 				.signWith(key, SignatureAlgorithm.HS256)
 				.compact();
 
@@ -61,8 +61,8 @@ public class JwtTokenProvider {
 	}
 
 	// LocalDateTime To Date
-	public Date getTokenDate(LocalDateTime time) {
-		return java.sql.Timestamp.valueOf(time);
+	public Date getTokenDate(Integer day) {
+		return java.sql.Timestamp.valueOf(LocalDateTime.now().plusDays(day).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 	}
 
 }
