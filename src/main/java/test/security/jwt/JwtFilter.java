@@ -4,7 +4,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -28,15 +30,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		if(token != null && provider.validateToken(token)) {
 			// 토큰 인증 검사
-
-
-			// 다음 필터로 넘기기
-			filterChain.doFilter(request, response);
+			Authentication authentication = provider.getAuthentication(token);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		}else{
 			// error handler
 			throw new AuthenticationException("토큰이 없음"){};
 		}
+		// 다음 필터로 넘기기
+		filterChain.doFilter(request, response);
 	}
 
 	private String resolveToken(HttpServletRequest request) {

@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,9 +12,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import test.login.entity.Member;
+import test.repository.MemberRepository;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -26,6 +28,9 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
 	private final SecretKey key;
+
+	@Autowired
+	private MemberRepository repository;
 
 	public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
 		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -78,8 +83,9 @@ public class JwtTokenProvider {
 						.map(SimpleGrantedAuthority::new)
 						.collect(Collectors.toList());//사용자의 Role과 권한을 조회하여 SimpleAuthority 목록을 authorities에 세팅한다.
 
-		UserDetails principal = new User(claims.getSubject(), "", authorities);//계정정보를 담은 User 객체를 생성한다.
-		return new UsernamePasswordAuthenticationToken(principal, "", authorities);//Authentication 객체를 반환한다.
+		Member member = repository.findByLoginId(claims.getSubject());
+
+		return new UsernamePasswordAuthenticationToken(member, accessToken, authorities);//Authentication 객체를 반환한다.
 	}
 
 	private Claims parseClaims(String accessToken) {
@@ -92,6 +98,7 @@ public class JwtTokenProvider {
 
 	// 토큰 정보를 검증하는 메서드
 	public boolean validateToken(String token) {
+		System.out.println(token);
 		try {
 			Jwts.parser()
 					.verifyWith(this.key)
