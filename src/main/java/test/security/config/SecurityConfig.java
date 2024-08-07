@@ -1,5 +1,8 @@
 package test.security.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,18 +10,18 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import test.security.jwt.JwtAuthencationEntryPoint;
 import test.security.jwt.JwtFilter;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-	private final JwtAuthencationEntryPoint entryPoint;
 	private final JwtFilter filter;
+	private final String[] AUTH = {"/user/**","/h2-console/**","/favicon.ico","/api/user/**"};
 
-	public SecurityConfig(JwtAuthencationEntryPoint entryPoint, JwtFilter filter) {
-		this.entryPoint = entryPoint;
+	public SecurityConfig(JwtFilter filter) {
 		this.filter = filter;
 	}
 
@@ -29,11 +32,9 @@ public class SecurityConfig {
 				.csrf(csrfConfigurer -> csrfConfigurer.disable())
 				.headers(headerConfig -> headerConfig.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))
 				.authorizeHttpRequests(auth ->
-						auth.requestMatchers("/hello","/hello3","/h2-console/**","/login")
-								.permitAll()
-								.anyRequest().hasRole("USER"))
+						auth.requestMatchers(AUTH)
+								.permitAll())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.exceptionHandling(exceptionHalder->exceptionHalder.authenticationEntryPoint(entryPoint))
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}

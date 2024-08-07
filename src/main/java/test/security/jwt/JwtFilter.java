@@ -12,40 +12,27 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-	private JwtTokenProvider provider;
-
-	public JwtFilter(JwtTokenProvider provider) {
-		this.provider = provider;
-	}
-
+	private final String[] permitAllArray= {"/user/sign","/api/token", "/h2-console/login.do", "/h2-console/login.jsp", "/h2-console/"};
 	// http요청을 중간에 jwtFilter[커스터마이징 필터] 에서 토큰 검증
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-		String token = resolveToken(request);
-
-		if(token != null && provider.validateToken(token)) {
-			// 토큰 인증 검사
-			Authentication authentication = provider.getAuthentication(token);
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-
-		}else{
-			// error handler
-			throw new AuthenticationException("토큰이 없음"){};
-		}
-		// 다음 필터로 넘기기
+		String requestURI = request.getRequestURI();
 		filterChain.doFilter(request, response);
+
+		// token 검증
+
 	}
 
-	private String resolveToken(HttpServletRequest request) {
-		String bearerToken = request.getHeader("Authorization");
-		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-			return bearerToken.substring(7);
-		}
-		return null;
+	private boolean getPermitAllRequest(String requestURI) {
+		return Arrays.stream(permitAllArray).anyMatch(
+				e -> e.equals(requestURI)
+		);
 	}
+
 }

@@ -1,6 +1,8 @@
-package test.login.entity;
+package test.web.entity.user;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,18 +19,23 @@ public class Member {
 	@Column(name = "MEMBER_ID") // 아이디에 해당하는 컬럼명 선언
 	private Long id;
 
+	@NotEmpty
 	@Column(name = "MEMBER_LOGIN_ID")
 	private String loginId;
 
 	@Column(name = "MEMBER_ROLE")
-	private String role;
+	@Enumerated(EnumType.STRING)
+	private MemberRole role = MemberRole.USER;
 
+	@NotEmpty
 	@Column(name = "MEMBER_NAME")
 	private String name;
 
+	@Min(8)
 	@Column(name = "MEMBER_PASSWORD")
 	private String password;
 
+	@NotEmpty
 	@Column(name = "MEMBER_EMAIL")
 	private String email;
 
@@ -38,10 +45,10 @@ public class Member {
 	@Column(name = "IS_DEL")
 	private String isDel;
 
-	@Column(name = "ISRT_DATE")
+	@Column(name = "SYS_DATE")
 	private LocalDateTime isrtDate;
 
-	@Column(name = "UPDT_DATE")
-	private LocalDateTime updtDate;
+	@Column(name = "REG_DATE")
+	private LocalDateTime updtDate = LocalDateTime.now();
 
 }
