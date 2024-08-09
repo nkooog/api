@@ -4,6 +4,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,22 +20,31 @@ import java.util.Arrays;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-	private final String[] permitAllArray= {"/user/sign","/api/token", "/h2-console/login.do", "/h2-console/login.jsp", "/h2-console/"};
+
+	private final JwtTokenProvider provider;
+	@Autowired
+	private ApplicationContext applicationContext;
+
+	public JwtFilter(JwtTokenProvider provider) {
+		this.provider = provider;
+	}
+
 	// http요청을 중간에 jwtFilter[커스터마이징 필터] 에서 토큰 검증
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
 		String requestURI = request.getRequestURI();
+		String token = resolveToken(request);
+
 		filterChain.doFilter(request, response);
-
-		// token 검증
-
 	}
 
-	private boolean getPermitAllRequest(String requestURI) {
-		return Arrays.stream(permitAllArray).anyMatch(
-				e -> e.equals(requestURI)
-		);
+	private String resolveToken(HttpServletRequest request) {
+		String bearerToken = request.getHeader("Authorization");
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			return bearerToken.substring(7);
+		}
+		return null;
 	}
 
 }
