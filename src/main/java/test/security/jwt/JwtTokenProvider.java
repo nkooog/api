@@ -39,8 +39,6 @@ public class JwtTokenProvider {
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.joining(","));
 
-		long now = (new Date().getTime());
-
 		Date accessTokenExpiration = getTokenDate(1);
 		Date refreshTokenExpiration = getTokenDate(7);
 
