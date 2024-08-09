@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import test.repository.MemberRepository;
+import test.security.jwt.JwtToken;
 import test.security.jwt.JwtTokenProvider;
 import test.service.AuthenticationService;
 import test.service.CustomUserDetailService;
@@ -72,19 +73,26 @@ public class MemberController {
 		return ResponseEntity.created(createURI).body(member);
 	}
 
-	@PostMapping("/user/login")
-	public ResponseEntity login(@RequestBody MemberDTO memberDTO) throws Exception {
+	@PostMapping("/login")
+	public ResponseEntity login(@RequestBody MemberDTO memberDTO) {
 
-		Authentication authentication = service.authenticate(memberDTO.getLoginId(), memberDTO.getPassword());
+		log.debug(" ##### login");
+		JwtToken token = null;
+		try{
+			Authentication authentication = service.authenticate(memberDTO.getLoginId(), memberDTO.getPassword());
+			token = provider.generateToken(authentication);
+		}catch (Exception e) {
+			log.debug(e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
 
-		provider.generateToken(authentication);
 
 
 //		SecurityContextHolder.getContext().setAuthentication(authentication);
 //
 //		String jwt = tokenProvider.createToken(authentication);
 
-		return ResponseEntity.ok(null);
+		return ResponseEntity.ok(token);
 	}
 
 
