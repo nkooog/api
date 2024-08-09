@@ -1,6 +1,5 @@
 package test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import org.junit.jupiter.api.Test;
@@ -10,9 +9,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import test.security.config.SecurityConfig;
 import test.web.entity.user.Member;
 
 import java.time.LocalDateTime;
@@ -90,6 +89,12 @@ class Demo2ApplicationTests {
 		permitAll(String url) {
 			this.url = url;
 		}
+	}
+
+	@Test
+	public void secret() throws Exception {
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		System.out.println(passwordEncoder.encode("test"));
 	}
 
 }

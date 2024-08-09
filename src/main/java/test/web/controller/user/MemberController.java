@@ -3,17 +3,31 @@ package test.web.controller.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsPasswordService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import test.repository.MemberRepository;
+import test.security.jwt.JwtToken;
+import test.security.jwt.JwtTokenProvider;
+import test.service.AuthenticationService;
+import test.service.CustomUserDetailService;
 import test.web.entity.user.Member;
 import test.web.entity.user.MemberDTO;
 import test.web.entity.user.MemberValidation;
 
 import java.net.URI;
+import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
@@ -23,23 +37,21 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class MemberController {
 	private final MemberValidation validation;
 	private final MemberRepository repository;
+	private final CustomUserDetailService userDetailService;
+	private final JwtTokenProvider provider;
+	private final AuthenticationService service;
 	private ObjectMapper objectMapper;
 
-	public MemberController(MemberValidation validation, MemberRepository repository, ObjectMapper objectMapper) {
+
+
+
+	public MemberController(MemberValidation validation, MemberRepository repository, CustomUserDetailService userDetailService, JwtTokenProvider provider, ObjectMapper objectMapper, AuthenticationService service) {
 		this.validation = validation;
 		this.repository = repository;
+		this.userDetailService = userDetailService;
+		this.provider = provider;
 		this.objectMapper = objectMapper;
-	}
-
-	@GetMapping(value="/{id}")
-	public ResponseEntity findByMember(@PathVariable String id) throws Exception {
-		Member member = this.repository.findByLoginId(id);
-
-		if(member == null) {
-			return ResponseEntity.notFound().build();
-		}
-
-		return ResponseEntity.ok().body(member);
+		this.service = service;
 	}
 
 	@PostMapping(value = "/sign")
@@ -61,6 +73,27 @@ public class MemberController {
 		return ResponseEntity.created(createURI).body(member);
 	}
 
+	@PostMapping("/login")
+	public ResponseEntity login(@RequestBody MemberDTO memberDTO) {
+
+		log.debug(" ##### login");
+		JwtToken token = null;
+		try{
+			Authentication authentication = service.authenticate(memberDTO.getLoginId(), memberDTO.getPassword());
+			token = provider.generateToken(authentication);
+		}catch (Exception e) {
+			log.debug(e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+
+
+
+//		SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//		String jwt = tokenProvider.createToken(authentication);
+
+		return ResponseEntity.ok(token);
+	}
 
 
 }

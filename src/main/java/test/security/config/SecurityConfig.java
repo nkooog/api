@@ -19,7 +19,7 @@ import java.util.Arrays;
 public class SecurityConfig {
 
 	private final JwtFilter filter;
-	private final String[] AUTH = {"/user/**","/h2-console/**","/favicon.ico","/api/user/**"};
+	private final String[] AUTH = {"/h2-console/**","/favicon.ico","/api/user/**"};
 
 	public SecurityConfig(JwtFilter filter) {
 		this.filter = filter;
