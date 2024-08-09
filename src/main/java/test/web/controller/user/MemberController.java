@@ -42,9 +42,6 @@ public class MemberController {
 	private final AuthenticationService service;
 	private ObjectMapper objectMapper;
 
-
-
-
 	public MemberController(MemberValidation validation, MemberRepository repository, CustomUserDetailService userDetailService, JwtTokenProvider provider, ObjectMapper objectMapper, AuthenticationService service) {
 		this.validation = validation;
 		this.repository = repository;
@@ -74,23 +71,18 @@ public class MemberController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity login(@RequestBody MemberDTO memberDTO) {
+	public ResponseEntity login(@RequestBody MemberDTO memberDTO, Errors errors) {
 
 		log.debug(" ##### login");
 		JwtToken token = null;
-		try{
-			Authentication authentication = service.authenticate(memberDTO.getLoginId(), memberDTO.getPassword());
-			token = provider.generateToken(authentication);
-		}catch (Exception e) {
-			log.debug(e.getMessage());
-			return ResponseEntity.badRequest().body(e.getMessage());
+		Authentication authentication = service.authenticate(memberDTO.getLoginId(), memberDTO.getPassword(), errors);
+
+		if(errors.hasErrors()) {
+			return ResponseEntity.badRequest().body(errors);
 		}
 
+		token = provider.generateToken(authentication);
 
-
-//		SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//		String jwt = tokenProvider.createToken(authentication);
 
 		return ResponseEntity.ok(token);
 	}

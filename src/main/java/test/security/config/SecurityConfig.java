@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import test.security.jwt.JwtAuthencationEntryPoint;
 import test.security.jwt.JwtFilter;
 
 import java.util.Arrays;
@@ -19,10 +20,12 @@ import java.util.Arrays;
 public class SecurityConfig {
 
 	private final JwtFilter filter;
+	private final JwtAuthencationEntryPoint entryPoint;
 	private final String[] AUTH = {"/h2-console/**","/favicon.ico","/api/user/**"};
 
-	public SecurityConfig(JwtFilter filter) {
+	public SecurityConfig(JwtFilter filter, JwtAuthencationEntryPoint entryPoint) {
 		this.filter = filter;
+		this.entryPoint = entryPoint;
 	}
 
 	@Bean
@@ -35,6 +38,7 @@ public class SecurityConfig {
 						auth.requestMatchers(AUTH)
 								.permitAll())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint))
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}

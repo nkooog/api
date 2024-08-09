@@ -24,4 +24,8 @@ public class MemberValidation {
 
 	}
 
+	public void loginValidation(Errors errors) {
+		errors.rejectValue(ValidationMessage.NOT_MATCH_PASSWORD.getField(), ValidationMessage.NOT_MATCH_PASSWORD.getError(), ValidationMessage.NOT_MATCH_PASSWORD.getMessage());
+	}
+
 }
