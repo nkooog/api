@@ -36,7 +36,10 @@ public class SecurityConfig {
 				.headers(headerConfig -> headerConfig.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))
 				.authorizeHttpRequests(auth ->
 						auth.requestMatchers(AUTH)
-								.permitAll())
+								.permitAll()
+								.requestMatchers("/user/**").hasRole("USER").anyRequest().permitAll()
+								.requestMatchers("/admin/**").hasRole("ADMIN").anyRequest().permitAll()
+				)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint))
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
