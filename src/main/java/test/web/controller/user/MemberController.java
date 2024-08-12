@@ -67,16 +67,14 @@ public class MemberController {
 	@PostMapping("/login")
 	public ResponseEntity login(@RequestBody MemberDTO memberDTO, Errors errors) {
 
-		log.debug(" ##### login");
 		JwtToken token = null;
 		Authentication authentication = service.authenticate(memberDTO.getLoginId(), memberDTO.getPassword(), errors);
 
-		if(errors.hasErrors()) {
+		if(authentication == null) {
 			return ResponseEntity.badRequest().body(errors);
 		}
 
 		token = provider.generateToken(authentication);
-
 
 		return ResponseEntity.ok(token);
 	}

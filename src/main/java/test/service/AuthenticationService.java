@@ -27,13 +27,8 @@ public class AuthenticationService {
 
 	public Authentication authenticate(String username, String password, Errors errors) {
 		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-		if (encoder.matches(password, userDetails.getPassword())) {
-			return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
-		} else {
-			validation.loginValidation(errors);
-			return null;
-		}
+		return (userDetails != null && encoder.matches(password, userDetails.getPassword())) ?
+				new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities()) : null;
 	}
 
 }
