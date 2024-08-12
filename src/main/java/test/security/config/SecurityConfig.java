@@ -1,8 +1,5 @@
 package test.security.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,8 +9,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import test.security.jwt.JwtAuthencationEntryPoint;
 import test.security.jwt.JwtFilter;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -37,8 +32,8 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth ->
 						auth.requestMatchers(AUTH)
 								.permitAll()
-								.requestMatchers("/user/**").hasRole("USER").anyRequest().permitAll()
-								.requestMatchers("/admin/**").hasRole("ADMIN").anyRequest().permitAll()
+								.requestMatchers("/user/**").permitAll()
+//								.requestMatchers("/admin/**").hasRole("ADMIN").anyRequest().permitAll()
 				)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint))

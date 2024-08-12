@@ -3,17 +3,9 @@ package test.web.controller.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -27,11 +19,11 @@ import test.web.entity.user.MemberDTO;
 import test.web.entity.user.MemberValidation;
 
 import java.net.URI;
-import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Slf4j
+@CrossOrigin(origins = "*", allowedHeaders = "*") // ??? 이거 뭐 어케 바꿔야함
 @RestController
 @RequestMapping(value = "/api/user", produces = MediaTypes.HAL_JSON_VALUE)
 public class MemberController {
@@ -40,15 +32,17 @@ public class MemberController {
 	private final CustomUserDetailService userDetailService;
 	private final JwtTokenProvider provider;
 	private final AuthenticationService service;
+	private final BCryptPasswordEncoder encoder;
 	private ObjectMapper objectMapper;
 
-	public MemberController(MemberValidation validation, MemberRepository repository, CustomUserDetailService userDetailService, JwtTokenProvider provider, ObjectMapper objectMapper, AuthenticationService service) {
+	public MemberController(MemberValidation validation, MemberRepository repository, CustomUserDetailService userDetailService, JwtTokenProvider provider, ObjectMapper objectMapper, AuthenticationService service, BCryptPasswordEncoder encoder) {
 		this.validation = validation;
 		this.repository = repository;
 		this.userDetailService = userDetailService;
 		this.provider = provider;
 		this.objectMapper = objectMapper;
 		this.service = service;
+		this.encoder = encoder;
 	}
 
 	@PostMapping(value = "/sign")

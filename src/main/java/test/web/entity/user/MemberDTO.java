@@ -13,13 +13,13 @@ public class MemberDTO {
 	@NotEmpty
 	private String loginId;
 
-	@NotEmpty
+//	@NotEmpty
 	private String name;
 
 	@NotEmpty
 	private String password;
 
-	@NotEmpty
+//	@NotEmpty
 	private String email;
 
 }
