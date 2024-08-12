@@ -27,15 +27,14 @@ public class Member {
 	@Enumerated(EnumType.STRING)
 	private MemberRole role = MemberRole.USER;
 
-	@NotEmpty
+//	@NotEmpty
 	@Column(name = "MEMBER_NAME")
 	private String name;
 
-	@Min(8)
 	@Column(name = "MEMBER_PASSWORD")
 	private String password;
 
-	@NotEmpty
+//	@NotEmpty
 	@Column(name = "MEMBER_EMAIL")
 	private String email;
 
