@@ -1,9 +1,11 @@
 package test.security.jwt;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -19,6 +21,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
+@Slf4j
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -39,8 +42,11 @@ public class JwtFilter extends OncePerRequestFilter {
 		String token = tokenResolver.apply(request);
 
 		if( token != null ) {
-			boolean isValid = provider.validateToken(token);
-			if(isValid) {
+			Authentication authentication = provider.getAuthentication(token);
+
+			if(authentication!=null)  {
+				// 다음 filter로 가기전 authentication 정보는 SecurityContextHolder에 담는다.
+				SecurityContextHolder.getContext().setAuthentication(authentication);
 				filterChain.doFilter(request, response);
 			}
 		}

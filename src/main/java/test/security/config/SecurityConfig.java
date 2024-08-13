@@ -32,11 +32,12 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth ->
 						auth.requestMatchers(AUTH)
 								.permitAll()
-								.requestMatchers("/user/**").permitAll()
+								.requestMatchers("/user/**").hasAuthority("USER")
+								.requestMatchers("/admin/**").hasAuthority("ADMIN")
 //								.requestMatchers("/admin/**").hasRole("ADMIN").anyRequest().permitAll()
 				)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint))
+//				.exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint))
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}

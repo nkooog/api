@@ -1,7 +1,5 @@
 package test.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,12 +26,13 @@ public class AuthenticationService {
 	public Authentication authenticate(String username, String password, Errors errors) {
 		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-		if (encoder.matches(password, userDetails.getPassword())) {
-			return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
-		} else {
+		if( userDetails == null || (userDetails != null && !encoder.matches(password, userDetails.getPassword()))) {
 			validation.loginValidation(errors);
 			return null;
+		}else{
+			return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
 		}
+
 	}
 
 }
