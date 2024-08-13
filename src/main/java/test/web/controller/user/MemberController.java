@@ -70,7 +70,7 @@ public class MemberController {
 		JwtToken token = null;
 		Authentication authentication = service.authenticate(memberDTO.getLoginId(), memberDTO.getPassword(), errors);
 
-		if(authentication == null) {
+		if(errors.hasErrors()) {
 			return ResponseEntity.badRequest().body(errors);
 		}
 

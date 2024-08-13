@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
+import test.web.entity.user.MemberDTO;
 import test.web.entity.user.MemberValidation;
 
 @Service
@@ -27,8 +28,14 @@ public class AuthenticationService {
 
 	public Authentication authenticate(String username, String password, Errors errors) {
 		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-		return (userDetails != null && encoder.matches(password, userDetails.getPassword())) ?
-				new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities()) : null;
+
+		if( userDetails == null || (userDetails != null && !encoder.matches(password, userDetails.getPassword()))) {
+			validation.loginValidation(errors);
+			return null;
+		}else{
+			return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+		}
+
 	}
 
 }

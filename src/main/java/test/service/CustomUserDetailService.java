@@ -25,7 +25,7 @@ public class CustomUserDetailService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		return repository.findByLoginId(username)
 				.map(this::createUserDetails)
-				.orElseThrow(() -> null);
+				.orElse(null);
 	}
 
 	// DB 에 User 값이 존재한다면 UserDetails 객체로 만들어서 리턴

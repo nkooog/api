@@ -24,8 +24,8 @@ public class MemberValidation {
 
 	}
 
-	public void loginValidation(MemberDTO memberDTO, Errors errors) {
-
+	public void loginValidation(Errors errors) {
+		errors.rejectValue(ValidationMessage.NOT_MATCH.getField(), ValidationMessage.NOT_MATCH.getError(), ValidationMessage.NOT_MATCH.getMessage());
 	}
 
 }
