@@ -1,5 +1,6 @@
 package test.security.jwt;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,11 +42,12 @@ public class JwtFilter extends OncePerRequestFilter {
 		String token = tokenResolver.apply(request);
 
 		if( token != null ) {
-			boolean isValid = provider.validateToken(token);
-			log.debug( "isValid : " + isValid);
-			if(isValid) {
+			Authentication authentication = provider.getAuthentication(token);
+
+			if(authentication!=null)  {
+				// 다음 filter로 가기전 authentication 정보는 SecurityContextHolder에 담는다.
+				SecurityContextHolder.getContext().setAuthentication(authentication);
 				filterChain.doFilter(request, response);
-				return;
 			}
 		}
 		filterChain.doFilter(request, response);
