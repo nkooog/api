@@ -35,6 +35,8 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth ->
 						auth.requestMatchers(AUTH)
 								.permitAll()
+								// DB에 ROLE_USER 형식이 아닌 USER 형식으로 들어가 있어 hasAuthority로 사용. 관례로 ROLE_USER 형식일 경우 hasRole로 사용
+//								.requestMatchers("/user/**").hasRole("USER")
 								.requestMatchers("/user/**").hasAuthority("USER")
 								.requestMatchers("/admin/**").hasAuthority("ADMIN")
 				)
