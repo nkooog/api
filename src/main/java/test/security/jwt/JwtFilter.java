@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
+@Slf4j
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -40,8 +42,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		if( token != null ) {
 			boolean isValid = provider.validateToken(token);
+			log.debug( "isValid : " + isValid);
 			if(isValid) {
 				filterChain.doFilter(request, response);
+				return;
 			}
 		}
 		filterChain.doFilter(request, response);
