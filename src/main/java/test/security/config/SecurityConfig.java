@@ -26,15 +26,17 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
+				// form방식 로그인이 아니므로 비활성화
 				.httpBasic(httpBasic -> httpBasic.disable())
+				// csrf 비활성화 이유는 확인해야함
 				.csrf(csrfConfigurer -> csrfConfigurer.disable())
+				// h2 console을 사용하기 위함. 기본적으로 security에서 방지
 				.headers(headerConfig -> headerConfig.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))
 				.authorizeHttpRequests(auth ->
 						auth.requestMatchers(AUTH)
 								.permitAll()
 								.requestMatchers("/user/**").hasAuthority("USER")
 								.requestMatchers("/admin/**").hasAuthority("ADMIN")
-//								.requestMatchers("/admin/**").hasRole("ADMIN").anyRequest().permitAll()
 				)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 //				.exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint))

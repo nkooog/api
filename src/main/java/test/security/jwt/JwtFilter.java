@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.Authentication;
@@ -27,8 +28,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
 	private final JwtTokenProvider provider;
-	@Autowired
-	private ApplicationContext applicationContext;
+
+	@Value("${jwt.header}")
+	private String header;
+
+	@Value("${jwt.type}")
+	private String type;
 
 	public JwtFilter(JwtTokenProvider provider) {
 		this.provider = provider;
@@ -54,8 +59,8 @@ public class JwtFilter extends OncePerRequestFilter {
 	}
 
 	private String resolveToken(HttpServletRequest request) {
-		String bearerToken = request.getHeader("Authorization");
-		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+		String bearerToken = request.getHeader(this.header);
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(this.type)) {
 			return bearerToken.substring(7);
 		}
 		return null;

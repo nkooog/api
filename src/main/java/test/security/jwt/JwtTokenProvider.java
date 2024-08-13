@@ -30,12 +30,15 @@ public class JwtTokenProvider {
 
 	private final SecretKey key;
 
-	private final MemberRepository repository;
+	@Value("${jwt.header}")
+	private String header;
 
-	public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, MemberRepository repository) {
+	@Value("${jwt.type}")
+	private String type;
+
+	public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
 		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 		this.key = Keys.hmacShaKeyFor(keyBytes);
-		this.repository = repository;
 	}
 
 	public JwtToken generateToken(Authentication authentication) {
@@ -50,7 +53,7 @@ public class JwtTokenProvider {
 		// Access Token 생성
 		String accessToken = Jwts.builder()
 				.subject(authentication.getName())
-				.claim("auth", authorities)
+				.claim(this.header, authorities)
 				.expiration(accessTokenExpiration)
 				.signWith(key, SignatureAlgorithm.HS256)
 				.compact();
@@ -62,7 +65,7 @@ public class JwtTokenProvider {
 				.compact();
 
 		return JwtToken.builder()
-				.grantType("Bearer")
+				.grantType(this.type.trim())
 				.accessToken(accessToken)
 				.refreshToken(refreshToken)
 				.build();
@@ -86,13 +89,13 @@ public class JwtTokenProvider {
 			return null;
 		}
 
-		if (claims.get("auth") == null) {
+		if (claims.get(this.header) == null) {
 			throw new RuntimeException("권한 정보가 없는 토큰입니다.");
 		}
 
 		// 클레임에서 권한 정보 가져오기
 		Collection<? extends GrantedAuthority> authorities =
-				Arrays.stream(claims.get("auth").toString().split(","))
+				Arrays.stream(claims.get(this.header).toString().split(","))
 						.map(SimpleGrantedAuthority::new)
 						.collect(Collectors.toList());
 
