@@ -16,7 +16,7 @@ public class SecurityConfig {
 
 	private final JwtFilter filter;
 	private final JwtAuthencationEntryPoint entryPoint;
-	private final String[] AUTH = {"/h2-console/**","/favicon.ico","/api/user/**"};
+	private final String[] AUTH = {"/h2-console/**","/favicon.ico","/api/user/**", "/swagger-ui/**", "/v3/api-docs/**"};
 
 	public SecurityConfig(JwtFilter filter, JwtAuthencationEntryPoint entryPoint) {
 		this.filter = filter;
@@ -38,7 +38,7 @@ public class SecurityConfig {
 								// DB에 ROLE_USER 형식이 아닌 USER 형식으로 들어가 있어 hasAuthority로 사용. 관례로 ROLE_USER 형식일 경우 hasRole로 사용
 //								.requestMatchers("/user/**").hasRole("USER")
 								.requestMatchers("/user/**").hasAuthority("USER")
-								.requestMatchers("/admin/**").hasAuthority("ADMIN")
+								.requestMatchers("/user/**","/admin/**").hasAuthority("ADMIN")
 				)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 //				.exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint))
