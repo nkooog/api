@@ -1,5 +1,6 @@
 package test.web.controller.user;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import test.common.JsonViews;
 import test.repository.MemberRepository;
 import test.security.jwt.JwtToken;
 import test.security.jwt.JwtTokenProvider;
@@ -54,8 +57,15 @@ public class MemberController {
 		this.encoder = encoder;
 	}
 
+	@Operation(summary = "user sign up", description = "사용자 가입")
+	@ApiResponses(value = {
+				@ApiResponse(responseCode = "201", description = "성공",
+					content = {@Content(schema = @Schema(implementation = MemberDTO.class))})
+			,   @ApiResponse(responseCode = "400", description = "잘못 된 요청")
+	})
+	@JsonView(JsonViews.Hidden.class)
 	@PostMapping(value = "/sign")
-	public ResponseEntity userSign(@RequestBody @Valid MemberDTO memberDTO, Errors errors) throws Exception {
+	public ResponseEntity userSign(@RequestBody MemberDTO memberDTO, Errors errors) throws Exception {
 
 		if(errors.hasErrors()) {
 			return ResponseEntity.badRequest().body(errors);
@@ -81,6 +91,7 @@ public class MemberController {
 	})
 	@Parameter(name="loginId, password", description = "로그인 유저 ID, 패스워드", example = "member1", required = true)
 	@PostMapping("/login")
+	@JsonView(JsonViews.Common.class)
 	public ResponseEntity login(@RequestBody MemberDTO memberDTO, Errors errors) {
 
 		JwtToken token = null;
