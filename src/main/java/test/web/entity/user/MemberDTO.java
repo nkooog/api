@@ -1,5 +1,6 @@
 package test.web.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +17,6 @@ import test.common.JsonViews;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MemberDTO {
-
 
 	@Schema(description = "회원 로그인 id")
 	@JsonView(JsonViews.Common.class)

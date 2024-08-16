@@ -10,25 +10,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.Errors;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import test.common.JsonViews;
 import test.repository.MemberRepository;
 import test.security.jwt.JwtToken;
 import test.security.jwt.JwtTokenProvider;
 import test.service.AuthenticationService;
-import test.service.CustomUserDetailService;
 import test.web.entity.user.Member;
 import test.web.entity.user.MemberDTO;
 import test.web.entity.user.MemberValidation;
+import test.web.service.UserService;
 
 import java.net.URI;
 
@@ -38,23 +36,15 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @CrossOrigin(origins = "*", allowedHeaders = "*") // ??? 이거 뭐 어케 바꿔야함
 @Tag(name = "Member", description = "Member API")
 @RestController
+@AllArgsConstructor
 @RequestMapping(value = "/api/user", produces = MediaTypes.HAL_JSON_VALUE)
 public class MemberController {
+
 	private final MemberValidation validation;
 	private final MemberRepository repository;
 	private final JwtTokenProvider provider;
 	private final AuthenticationService service;
-	private final BCryptPasswordEncoder encoder;
 	private ObjectMapper objectMapper;
-
-	public MemberController(MemberValidation validation, MemberRepository repository, JwtTokenProvider provider, ObjectMapper objectMapper, AuthenticationService service, BCryptPasswordEncoder encoder) {
-		this.validation = validation;
-		this.repository = repository;
-		this.provider = provider;
-		this.objectMapper = objectMapper;
-		this.service = service;
-		this.encoder = encoder;
-	}
 
 	@Operation(summary = "user sign up", description = "사용자 가입")
 	@ApiResponses(value = {
