@@ -1,6 +1,7 @@
 package test.web.controller.user;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,16 +42,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class MemberController {
 	private final MemberValidation validation;
 	private final MemberRepository repository;
-	private final CustomUserDetailService userDetailService;
 	private final JwtTokenProvider provider;
 	private final AuthenticationService service;
 	private final BCryptPasswordEncoder encoder;
 	private ObjectMapper objectMapper;
 
-	public MemberController(MemberValidation validation, MemberRepository repository, CustomUserDetailService userDetailService, JwtTokenProvider provider, ObjectMapper objectMapper, AuthenticationService service, BCryptPasswordEncoder encoder) {
+	public MemberController(MemberValidation validation, MemberRepository repository, JwtTokenProvider provider, ObjectMapper objectMapper, AuthenticationService service, BCryptPasswordEncoder encoder) {
 		this.validation = validation;
 		this.repository = repository;
-		this.userDetailService = userDetailService;
 		this.provider = provider;
 		this.objectMapper = objectMapper;
 		this.service = service;
@@ -92,18 +91,17 @@ public class MemberController {
 	@Parameter(name="loginId, password", description = "로그인 유저 ID, 패스워드", example = "member1", required = true)
 	@PostMapping("/login")
 	@JsonView(JsonViews.Common.class)
-	public ResponseEntity login(@RequestBody MemberDTO memberDTO, Errors errors) {
+	public ResponseEntity login(@RequestBody MemberDTO memberDTO, Errors errors) throws JsonProcessingException {
 
-		JwtToken token = null;
 		Authentication authentication = service.authenticate(memberDTO.getLoginId(), memberDTO.getPassword(), errors);
 
 		if(errors.hasErrors()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
 		}
 
-		token = provider.generateToken(authentication);
+		JwtToken token = provider.generateToken(authentication);
 
-		return ResponseEntity.ok(token);
+		return ResponseEntity.ok().body(this.objectMapper.writeValueAsString(token));
 	}
 
 

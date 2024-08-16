@@ -37,8 +37,8 @@ public class SecurityConfig {
 								.permitAll()
 								// DB에 ROLE_USER 형식이 아닌 USER 형식으로 들어가 있어 hasAuthority로 사용. 관례로 ROLE_USER 형식일 경우 hasRole로 사용
 //								.requestMatchers("/user/**").hasRole("USER")
-								.requestMatchers("/user/**").hasAuthority("USER")
-								.requestMatchers("/user/**","/admin/**").hasAuthority("ADMIN")
+								.requestMatchers("/admin/**").hasAuthority("ADMIN")
+								.requestMatchers("/user/**").hasAnyAuthority("ADMIN","USER")
 				)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 //				.exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint))

@@ -5,23 +5,18 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import test.repository.MemberRepository;
-import test.web.entity.user.Member;
 
 import javax.crypto.SecretKey;
-import javax.swing.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -100,7 +95,6 @@ public class JwtTokenProvider {
 						.collect(Collectors.toList());
 
 		// UserDetails 객체를 만들어서 Authentication 리턴
-//		Member principal = new UserCustom(claims.getSubject(), "", authorities, (Integer)claims.get("member_code"));
 		return new UsernamePasswordAuthenticationToken(null, null, authorities);
 	}
 

@@ -2,6 +2,7 @@ package test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import lombok.With;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,6 +115,21 @@ class Demo2ApplicationTests {
 	public void secret() throws Exception {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		System.out.println(passwordEncoder.encode("test"));
+	}
+
+	@Test
+	@WithMockUser(username = "admin1", roles = {"ADMIN"})
+	public void 관리자테스트() throws Exception {
+
+		String token ="Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEiLCJBdXRob3JpemF0aW9uIjoiQURNSU4iLCJleHAiOjE3MjM4NzQ4OTh9.sCkGAvypw7fFVLk-u5gYVx7kcrvHxaWNQRcCpVCudx4";
+
+		mockMvc.perform(post("/user/test")
+				.header("Authorization", token)
+				.contentType(MediaTypes.HAL_JSON_VALUE)
+				.accept(MediaTypes.HAL_JSON_VALUE)
+		)
+				.andExpect(status().isOk())
+				.andDo(print());
 	}
 
 }
