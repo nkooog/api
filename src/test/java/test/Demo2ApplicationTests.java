@@ -2,6 +2,7 @@ package test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import lombok.With;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +11,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import test.web.entity.user.Member;
+import test.web.entity.user.MemberDTO;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -51,6 +54,23 @@ class Demo2ApplicationTests {
 				.content(objectMapper.writeValueAsString(member))
 		)
 				.andExpect(status().isCreated())
+				.andDo(print());
+	}
+
+	@Test
+	public void 로그인및토큰발급테스트() throws Exception {
+
+		MemberDTO memberDTO = MemberDTO.builder()
+				.loginId("member1")
+				.password("test")
+				.build();
+
+		mockMvc.perform(post("/api/user/login")
+				.contentType(MediaTypes.HAL_JSON_VALUE)
+				.accept(MediaTypes.HAL_JSON_VALUE)
+				.content(this.objectMapper.writeValueAsString(memberDTO))
+		)
+				.andExpect(status().isOk())
 				.andDo(print());
 	}
 
@@ -95,6 +115,21 @@ class Demo2ApplicationTests {
 	public void secret() throws Exception {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		System.out.println(passwordEncoder.encode("test"));
+	}
+
+	@Test
+	@WithMockUser(username = "admin1", roles = {"ADMIN"})
+	public void 관리자테스트() throws Exception {
+
+		String token ="Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEiLCJBdXRob3JpemF0aW9uIjoiQURNSU4iLCJleHAiOjE3MjM4NzQ4OTh9.sCkGAvypw7fFVLk-u5gYVx7kcrvHxaWNQRcCpVCudx4";
+
+		mockMvc.perform(post("/user/test")
+				.header("Authorization", token)
+				.contentType(MediaTypes.HAL_JSON_VALUE)
+				.accept(MediaTypes.HAL_JSON_VALUE)
+		)
+				.andExpect(status().isOk())
+				.andDo(print());
 	}
 
 }
