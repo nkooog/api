@@ -57,9 +57,10 @@ public class Member implements UserDetails {
 	@Column(name = "REG_DATE")
 	private LocalDateTime updtDate = LocalDateTime.now();
 
+	// 계정권한 (USER or ADMIN)
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority(role.name()));
+		return List.of(new SimpleGrantedAuthority(this.role.name()));
 	}
 
 	@Override
@@ -67,11 +68,13 @@ public class Member implements UserDetails {
 		return null;
 	}
 
+	// 계정 만료여부
 	@Override
 	public boolean isAccountNonExpired() {
 		return false;
 	}
 
+	// 계정 잠김여부
 	@Override
 	public boolean isAccountNonLocked() {
 		return false;
@@ -82,6 +85,7 @@ public class Member implements UserDetails {
 		return false;
 	}
 
+	// 계정 사용여부
 	@Override
 	public boolean isEnabled() {
 		return false;

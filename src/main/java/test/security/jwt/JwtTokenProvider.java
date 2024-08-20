@@ -5,23 +5,18 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import test.repository.MemberRepository;
-import test.web.entity.user.Member;
 
 import javax.crypto.SecretKey;
-import javax.swing.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,12 +25,15 @@ public class JwtTokenProvider {
 
 	private final SecretKey key;
 
-	private final MemberRepository repository;
+	@Value("${jwt.header}")
+	private String header;
 
-	public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, MemberRepository repository) {
+	@Value("${jwt.type}")
+	private String type;
+
+	public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
 		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 		this.key = Keys.hmacShaKeyFor(keyBytes);
-		this.repository = repository;
 	}
 
 	public JwtToken generateToken(Authentication authentication) {
@@ -50,7 +48,7 @@ public class JwtTokenProvider {
 		// Access Token 생성
 		String accessToken = Jwts.builder()
 				.subject(authentication.getName())
-				.claim("auth", authorities)
+				.claim(this.header, authorities)
 				.expiration(accessTokenExpiration)
 				.signWith(key, SignatureAlgorithm.HS256)
 				.compact();
@@ -62,7 +60,7 @@ public class JwtTokenProvider {
 				.compact();
 
 		return JwtToken.builder()
-				.grantType("Bearer")
+				.grantType(this.type.trim())
 				.accessToken(accessToken)
 				.refreshToken(refreshToken)
 				.build();
@@ -86,18 +84,17 @@ public class JwtTokenProvider {
 			return null;
 		}
 
-		if (claims.get("auth") == null) {
+		if (claims.get(this.header) == null) {
 			throw new RuntimeException("권한 정보가 없는 토큰입니다.");
 		}
 
 		// 클레임에서 권한 정보 가져오기
 		Collection<? extends GrantedAuthority> authorities =
-				Arrays.stream(claims.get("auth").toString().split(","))
+				Arrays.stream(claims.get(this.header).toString().split(","))
 						.map(SimpleGrantedAuthority::new)
 						.collect(Collectors.toList());
 
 		// UserDetails 객체를 만들어서 Authentication 리턴
-//		Member principal = new UserCustom(claims.getSubject(), "", authorities, (Integer)claims.get("member_code"));
 		return new UsernamePasswordAuthenticationToken(null, null, authorities);
 	}
 
