@@ -17,18 +17,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import test.common.JsonViews;
-import test.repository.MemberRepository;
-import test.web.entity.user.Member;
 import test.web.entity.user.MemberDTO;
 import test.web.service.AdminService;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Tag(name = "admin api", description = "Admin Test API")
-@CrossOrigin(origins = "*", allowedHeaders = "*") // ??? 이거 뭐 어케 바꿔야함
+@CrossOrigin(origins = "*", allowedHeaders = "*") //
 @AllArgsConstructor
 @RestController
 @RequestMapping(value = "/admin", produces = MediaTypes.HAL_JSON_VALUE)
@@ -40,7 +36,10 @@ public class AdminTestController {
 
 	@PostMapping("/test")
 	public ResponseEntity test() throws Exception{
-		log.debug(" admin 로그인 테스트 ");
+
+
+		Thread.sleep(300000);
+
 		return ResponseEntity.ok().body("admin");
 	}
 

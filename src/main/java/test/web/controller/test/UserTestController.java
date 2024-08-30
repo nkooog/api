@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @Slf4j
 @Tag(name = "test", description = "User Test API")
-@CrossOrigin(origins = "*", allowedHeaders = "*") // ??? 이거 뭐 어케 바꿔야함
+@CrossOrigin(origins = "*", allowedHeaders = "*") //
 @AllArgsConstructor
 @RestController
 @RequestMapping(value = "/user", produces = MediaTypes.HAL_JSON_VALUE)
